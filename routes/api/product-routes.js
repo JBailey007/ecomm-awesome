@@ -45,10 +45,10 @@ router.get('/:id', async (req, res) => {
 // create new product
 router.post('/', async (req, res) => {
   try {
-    const newCategoryData = {
+    const newProductData = {
       ...req.body,
     } 
-    const data = await Product.create(newCategoryData);
+    const data = await Product.create(newProductData);
     console.log("************ Category post route is hit ************");
     res.status(200).json(data);
   } catch (error) {
@@ -62,6 +62,8 @@ router.post('/', async (req, res) => {
       tagIds: [1, 2, 3, 4]
     }
   */
+
+    //need to take a look at this and see why it is breaking the code. 
   Product.create(req.body)
     .then((product) => {
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
