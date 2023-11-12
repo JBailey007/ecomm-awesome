@@ -62,29 +62,27 @@ router.post('/', async (req, res) => {
       tagIds: [1, 2, 3, 4]
     }
   */
-
-    //need to take a look at this and see why it is breaking the code. 
-  Product.create(req.body)
-    .then((product) => {
-      // if there's product tags, we need to create pairings to bulk create in the ProductTag model
-      if (req.body.tagIds.length) {
-        const productTagIdArr = req.body.tagIds.map((tag_id) => {
-          return {
-            product_id: product.id,
-            tag_id,
-          };
-        });
-        return ProductTag.bulkCreate(productTagIdArr);
-      }
-      // if no product tags, just respond
-      res.status(200).json(product);
-    })
-    .then((productTagIds) => res.status(200).json(productTagIds))
-    .catch((err) => {
-      console.log(err);
-      res.status(400).json(err);
-    });
-});
+//   Product.create(req.body)
+//     .then((product) => {
+//       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
+//       if (req.body.tagIds.length) {
+//         const productTagIdArr = req.body.tagIds.map((tag_id) => {
+//           return {
+//             product_id: product.id,
+//             tag_id,
+//           };
+//         });
+//         return ProductTag.bulkCreate(productTagIdArr);
+//       }
+//       // if no product tags, just respond
+//       res.status(200).json(product);
+//     })
+//     .then((productTagIds) => res.status(200).json(productTagIds))
+//     .catch((err) => {
+//       console.log(err);
+//       res.status(400).json(err);
+//     });
+// });
 
 // update product
 router.put('/:id', async  (req, res) => {
@@ -131,8 +129,26 @@ router.put('/:id', async  (req, res) => {
     });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   // delete one product by its `id` value
+  try {
+    const data = await Product.destroy({
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (!data) {
+      res
+        .status(404)
+        .json({ message: "No Product found with this id!" });
+      return;
+    }
+    console.log("**************    Product Delete route hit *********");
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 });
 
 module.exports = router;
